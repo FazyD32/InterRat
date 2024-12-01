@@ -1,0 +1,126 @@
+<MyAppBar@MDTopAppBar>
+    title: "InterRat"
+    left_action_items: [['menu', lambda x: app.open_drawer()]]
+
+
+<UsersTable@MDGridLayout>
+    cols: 1
+
+
+<UsersScreen@Screen>
+    BoxLayout:
+        orientation: 'vertical'
+        MyAppBar:
+
+        UsersTable:
+            
+
+<PasswordScreen@Screen>
+    wronglabel: wrong_label
+    loginfield: login_field
+    passworfield: passwor_field
+
+    MDBoxLayout:
+        orientation: 'vertical'
+
+        MDTopAppBar:
+            title: "Приветствуем в InterRat"
+
+        MDLabel:
+            halign: 'center'
+            text: 'DesperBook'
+            font_style: 'Caption'
+            id: wrong_label
+
+        MDGridLayout:
+            cols: 1
+            spacing: 24
+            size_hint: 0.8, 1
+            pos_hint: {'center_x': 0.5,'center_y': 0.5}
+
+            MDTextField:    
+                mode: "round"  
+                text_color_focus: 'black'
+                line_color_focus: 'black'
+                helper_text: "Введите логин"
+                halign: "center"
+                icon_left: 'account'
+                id: login_field
+
+            MDTextField:    
+                mode: "round"  
+                text_color_focus: 'black'
+                line_color_focus: 'black'
+                helper_text: "Введите пароль"
+                halign: "center"
+                icon_left: 'magnify'
+                id: passwor_field
+
+        MDRectangleFlatButton:
+            text: 'Войти'
+            halign: 'center'
+            size_hint: 0.4, 0.2
+            pos_hint: {'center_x': 0.5,'y': 0.4}
+            on_release: app.enter(root.loginfield.text, root.passworfield.text, root.wronglabel, root.manager)
+
+        MDBoxLayout:
+
+
+<MenuScreen@Screen>
+    MDBoxLayout:
+        orientation: 'vertical'
+
+        MyAppBar:
+
+        MDLabel:
+            text: 'АМЕРИКА, гудбай'
+            halign: 'center'
+
+        Image:
+            source: 'Rattt.webp'
+
+
+<MyMainLayout>
+    navdrawer: nav_drawer
+    my_screenmg: myscmn
+
+    ScreenManager:
+        id: myscmn
+
+        PasswordScreen:
+
+        MenuScreen:
+            name: 'menu'
+
+        UsersScreen:
+            name: 'users'
+
+    MDNavigationDrawer:
+        id: nav_drawer
+
+        MDBoxLayout:
+            orientation: 'vertical'
+
+            MDLabel:
+                text: 'DesperBook'
+                font_style: 'Caption'
+                size_hint_y: None
+                height: self.texture_size[1]
+
+            ScrollView:
+
+                MDList:
+
+                    OneLineIconListItem:
+                        on_release: myscmn.current = 'menu'
+                        text: 'На главную'
+                        
+                        IconLeftWidget:
+                            icon: 'home'
+
+                    OneLineIconListItem:
+                        on_release: myscmn.current = 'users'
+                        text: 'Пользователи'
+
+                        IconLeftWidget:
+                            icon: 'table'
