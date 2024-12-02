@@ -94,6 +94,7 @@
 
         UsersTable:
 
+
 <UsersScreenAdd@Screen>:
 
     MDBoxLayout:
@@ -215,13 +216,300 @@
         orientation: 'vertical'
 
         MyAppBar:
+        MDGridLayout:
+            cols: 2
+            spacing: 24
+            padding: [16, 24, 0, 24]
 
-        MDLabel:
-            text: 'АМЕРИКА, гудбай'
-            halign: 'center'
+            MDLabel:
+                text: 'Имя пользователя: '
+                halign: 'left'
+                
+
+            MDLabel:
+                text: 'АМЕРИКА, гудбай'
+                halign: 'center'
+                id: usernm_info_label
+
+            MDLabel:
+                text: 'Номер пользователя: '
+                halign: 'left'
+                
+
+            MDLabel:
+                text: 'АМЕРИКА, гудбай'
+                halign: 'center'
+                id: userid_info_label
 
         Image:
             source: 'Rattt.webp'
+
+
+<PCTable@MDGridLayout>
+    cols: 1
+
+
+<PCTable2@MDGridLayout>
+    cols: 1
+
+
+<PCScreen@Screen>
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 24
+
+        MyAppBar:
+
+        MDGridLayout:
+            cols: 2
+            spacing: 24
+            padding: [24, 32, 8, 32]
+
+            MDLabel:
+                text: 'id'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: pc_id
+
+            MDLabel:
+                text: 'Модель'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: pc_model
+
+            MDLabel:
+                text: 'Категория'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: pc_cat
+
+            MDLabel:
+                text: 'Тариф / ч'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: pc_tarif
+            
+            MDGridLayout:
+                cols: 3
+                spacing: 8
+                padding: [0, 8, 8, 16]
+                size_hint_y: 0.4
+
+
+                MDRectangleFlatButton:
+                    text: 'Добавить'
+                    on_release: root.manager.current = 'pcsadd'
+                    id: btn_change_user
+
+                MDRectangleFlatButton:
+                    text: 'Удалить'
+
+                MDRectangleFlatButton:
+                    text: 'Изменить'
+
+        PCTable:
+
+<PCScreenAdd@Screen>:
+
+    MDBoxLayout:
+        spacing: 24
+        orientation: 'vertical'
+
+        MyAppBar:
+
+        MDLabel:
+            text: 'Добавте компьютер (Отобразится после перезагрузки)'
+            halign: 'center'
+
+        MDGridLayout:
+            cols: 2
+            spacing: 24
+            size_hint: 0.8, 1
+            pos_hint: {'center_x': 0.5,'center_y': 0.0}
+
+            MDTextField:     
+                text_color_focus: 'black'
+                line_color_focus: 'black'
+                helper_text: "Введите Тариф"
+                halign: "center"
+                id: tarif_field    
+
+            MDLabel:
+                text: 'На данный момент только игровая категория' 
+                halign: 'center'   
+
+            MDLabel:
+                text: 'id модели' 
+                halign: 'center'   
+                id: model_id  
+
+            MDGridLayout:
+                cols: 2
+                spacing: 24
+                size_hint: 0.8, 1
+                pos_hint: {'center_x': 0.5,'center_y': 0.0}
+
+                MDRectangleFlatButton:
+                    text: 'Добавить'
+                    on_release: root.add_pc_to_base(model_id.text, tarif_field.text)
+                    id: btn_add_pc
+                    
+
+                MDRectangleFlatButton:
+                    text: 'Отмена'
+                    on_release: root.manager.current = 'pcs'
+                    id: btn_add_pc_cancel
+                    
+        PCTable2:
+
+
+<TKTable@MDGridLayout>
+    cols: 1
+
+
+<TK@Screen>
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 24
+
+        MyAppBar:
+
+        MDGridLayout:
+            cols: 2
+            spacing: 24
+            padding: [24, 32, 8, 32]
+
+            MDLabel:
+                text: 'id'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: tk_id
+
+            MDLabel:
+                text: 'Дата'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: tkdt_id
+
+            MDLabel:
+                text: 'Ползователь'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: tkus_id
+
+            MDLabel:
+                text: 'Компьютер'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: tkpc_id
+
+            MDLabel:
+                text: 'Время / ч'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: tk_time
+            
+            MDGridLayout:
+                cols: 3
+                spacing: 8
+                padding: [0, 8, 8, 16]
+                size_hint_y: 0.4
+
+
+                MDRectangleFlatButton:
+                    text: 'Добавить'
+                    on_release: root.manager.current = 'pcsadd'
+                    id: btn_change_user
+
+                MDRectangleFlatButton:
+                    text: 'Удалить'
+
+                MDRectangleFlatButton:
+                    text: 'Изменить'
+
+        TKTable:
+
+<TKAdd@Screen>:
+
+    MDBoxLayout:
+        spacing: 24
+        orientation: 'vertical'
+
+        MyAppBar:
+
+        MDLabel:
+            text: 'Добавте компьютер (Отобразится после перезагрузки)'
+            halign: 'center'
+
+        MDGridLayout:
+            cols: 2
+            spacing: 24
+            size_hint: 0.8, 1
+            pos_hint: {'center_x': 0.5,'center_y': 0.0}
+
+            MDTextField:     
+                text_color_focus: 'black'
+                line_color_focus: 'black'
+                helper_text: "Введите Тариф"
+                halign: "center"
+                id: tarif_field    
+
+            MDLabel:
+                text: 'На данный момент только игровая категория' 
+                halign: 'center'   
+
+            MDLabel:
+                text: 'id модели' 
+                halign: 'center'   
+                id: model_id  
+
+            MDGridLayout:
+                cols: 2
+                spacing: 24
+                size_hint: 0.8, 1
+                pos_hint: {'center_x': 0.5,'center_y': 0.0}
+
+                MDRectangleFlatButton:
+                    text: 'Добавить'
+                    on_release: root.add_pc_to_base(model_id.text, tarif_field.text)
+                    id: btn_add_pc
+                    
+
+                MDRectangleFlatButton:
+                    text: 'Отмена'
+                    on_release: root.manager.current = 'pcs'
+                    id: btn_add_pc_cancel
+                    
+        PCTable:
 
 
 <MyMainLayout>
@@ -233,6 +521,7 @@
 
         MenuScreen:
             name: 'menu'
+            id: menu_id
 
         UsersScreen:
             name: 'users'
@@ -241,6 +530,21 @@
         UsersScreenAdd:
             name: 'usersadd'
             id: useradd_screen_id
+
+        PCScreen:
+            name: 'pcs'
+            id: pc_screen_id
+
+        PCScreenAdd:
+            name: 'pcsadd'
+            id: pcadd_screen_id
+
+        TK:
+            name: 'tk'
+            id: tk_screen_id
+
+        TKAdd:
+            name: 'tkadd'
 
     MDNavigationDrawer:
         id: nav_drawer
@@ -268,6 +572,20 @@
                     OneLineIconListItem:
                         on_release: my_screenmg.current = 'users'
                         text: 'Пользователи'
+
+                        IconLeftWidget:
+                            icon: 'table'
+                    
+                    OneLineIconListItem:
+                        on_release: my_screenmg.current = 'pcs'
+                        text: 'Компьютеры компании'
+
+                        IconLeftWidget:
+                            icon: 'table'
+
+                    OneLineIconListItem:
+                        on_release: my_screenmg.current = 'tk'
+                        text: 'билеты'
 
                         IconLeftWidget:
                             icon: 'table'

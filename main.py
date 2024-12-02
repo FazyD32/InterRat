@@ -12,18 +12,6 @@ from kivymd.uix.datatables import MDDataTable
 
 # КОММЕНТАРИИ К КОДУ БУДУТ ЗАВТРА.
 
-# Компилируется это дело через вертуалку, убунту и билдозер. В спеке прописываете фреймворки и разрешение на чтение и изменение файлов в андроид
-
-# Также стоит помнить, что про инкапсуляцию, и шифрование паролей (я про базу), но я пока сражаюсь именно с фреймворком, по этому в данном случае
-# такимми важными вещами принебрегаю, если же вы делаете что-то серьёзное, то за такое не похвалят :_)
-
-# 01/12/2024
-# Работает форма авторизации
-# Настроен первичный вывод информации, при нажатии на строку таблицы пользователей
-# Смена экранов и наследование классов
-# Запись логов запуска проги и ошибки
-# Отказоустойчивость прогги и таблицы
-
 class BaseControl:
     def __init__(self):
         try:
@@ -120,6 +108,22 @@ class BaseControl:
             VALUES ("Администратор")
                         ''')
             connect.commit()
+            cursor.execute('''
+            INSERT INTO UserCat (title) 
+            VALUES ("Клиент")
+                        ''')
+            connect.commit()
+            cursor.execute('''
+            INSERT INTO PCCategories (title) 
+            VALUES ("Игровой")
+                        ''')
+            connect.commit()
+            cursor.execute('''
+            INSERT INTO Model (title, cost) 
+            VALUES ("Игровой компьютер SmartDigital '1STPLAYER' процессор Intel i7 32GB DDR4", 56183)
+                        ''')
+            
+            connect.commit()
             connect.close()
         except Exception:
             with open('baseerr.txt', 'a') as file:
@@ -162,17 +166,17 @@ class UsersTable(MDGridLayout):
                                 ''').fetchall()
             self.table = MDDataTable(size_hint=(1, 1),
                                      pos_hint = {'center_x': 0.5,'y': 0.4},
-                                    rows_num = 40,
+                                    rows_num = 1000,
                                     column_data = [('id', 24), ('ФИО', self.width - 24)],
                                     row_data = [(e[0], e[1]) for e in self.data])
             self.add_widget(self.table)
-            self.table.bind(on_row_press=self.print_id)
+            self.table.bind(on_row_press=self.print_usertable)
         except Exception:
             with open('baseerr.txt', 'a') as file:
                 file.write(f'{datetime.datetime.now()} Ошибка отображения таблицы пользователей \n')
 
 
-    def print_id(self, instance_table, instance_row):
+    def print_usertable(self, instance_table, instance_row):
         id = (instance_row.text)
 
         if id in '0123456789':
@@ -181,11 +185,226 @@ class UsersTable(MDGridLayout):
             self.data = cursor.execute('''
             SELECT * FROM Users WHERE id = ? LIMIT 1
                            ''', (id,)).fetchall()
+            self.app = MDApp.get_running_app()
+            self.ids = self.app.root.ids.user_screen_id.ids
+            self.ids.user_id.text = str(self.data[0][0])
+            self.ids.user_namefull.text = str(self.data[0][1])
+            self.ids.birthday.text = str(self.data[0][2])
+            self.ids.user_login.text = str(self.data[0][3])
+            self.ids.user_password.text = str(self.data[0][4])
+            user_categ = cursor.execute('''
+            SELECT title FROM UserCat 
+            WHERE id = ? LIMIT 1
+                                        ''', (str(self.data[0][5]))).fetchall()
+            self.ids.user_cat.text = str(user_categ[0][0])
             print(*self.data, id)
 
             connect.commit()
             connect.close()
         
+
+class UsersScreenAdd(Screen):
+    def add_user_to_base(self, fullname, birthday, login, password):
+        try:
+            connect = sqlite3.connect('InterCof.db')
+            cursor = connect.cursor()
+
+            cursor.execute('''
+            INSERT INTO Users (fullname, birthday, login, password, cat_id)
+            VALUES (?, ?, ?, ?, ?)
+                        ''', (fullname, birthday, login, password, '2'))
+            self.manager.current = 'users'
+
+            connect.commit()
+            connect.close()
+        except Exception:
+            with open('baseerr.txt', 'a') as file:
+                file.write(f'{datetime.datetime.now()} Ошибка добавления пользователя \n')
+
+
+class PCTable(MDGridLayout):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            connect = sqlite3.connect('InterCof.db')
+            cursor = connect.cursor()
+            self.data = cursor.execute('''
+            SELECT PC.id, Model.title FROM PC
+            JOIN Model ON PC.id_model = Model.id 
+                                ''').fetchall()
+            print(self.data)
+            self.table = MDDataTable(size_hint=(1, 1),
+                                     pos_hint = {'center_x': 0.5,'y': 0.4},
+                                    rows_num = 1000,
+                                    column_data = [('id', 24), ('Модель', self.width - 24)],
+                                    row_data = [(e[0], e[1]) for e in self.data])
+            self.add_widget(self.table)
+            self.table.bind(on_row_press=self.print_pcsrtable)
+        except Exception:
+            with open('baseerr.txt', 'a') as file:
+                file.write(f'{datetime.datetime.now()} Ошибка отображения таблицы компьютеров \n')
+
+
+    def print_pcsrtable(self, instance_table, instance_row):
+        id = (instance_row.text)
+
+        if id in '0123456789':
+            connect = sqlite3.connect('InterCof.db')
+            cursor = connect.cursor()
+            self.data = cursor.execute('''
+            SELECT PC.id, Model.title, PCCategories.title, PC.tarif FROM PC
+            JOIN Model ON PC.id_model = Model.id
+            JOIN PCCategories ON Pc.id_cat = PCCategories.id
+            WHERE PC.id = ? 
+            LIMIT 1
+                           ''', (id,)).fetchall()
+            self.app = MDApp.get_running_app()
+            self.ids = self.app.root.ids.pc_screen_id.ids
+            self.ids.pc_id.text = str(self.data[0][0])
+            self.ids.pc_model.text = str(self.data[0][1])
+            self.ids.pc_cat.text = str(self.data[0][2])
+            self.ids.pc_tarif.text = str(self.data[0][3])
+
+            print(*self.data, id)
+
+            connect.commit()
+            connect.close()
+
+
+class PCScreenAdd(Screen):
+    def add_pc_to_base(self, id_model, tarif, id_cat='1'):
+        try:
+            connect = sqlite3.connect('InterCof.db')
+            cursor = connect.cursor()
+
+            if id_model == 'id модели':
+                id_model = '1'
+
+            cursor.execute('''
+            INSERT INTO PC (id_model, id_cat, tarif)
+            VALUES (?, ?, ?)
+                        ''', (id_model, id_cat, tarif))
+            self.manager.current = 'pcs'
+
+            connect.commit()
+            connect.close()
+        except Exception:
+            with open('baseerr.txt', 'a') as file:
+                file.write(f'{datetime.datetime.now()} Ошибка добавления компьютера \n')
+
+
+class PCTable2(MDGridLayout):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            connect = sqlite3.connect('InterCof.db')
+            cursor = connect.cursor()
+            self.data = cursor.execute('''
+            SELECT id, Model.title FROM Model
+                                ''').fetchall()
+            print(self.data)
+            self.table = MDDataTable(size_hint=(1, 1),
+                                     pos_hint = {'center_x': 0.5,'y': 0.4},
+                                    rows_num = 1000,
+                                    column_data = [('id', 24), ('Модель', self.width - 24)],
+                                    row_data = [(e[0], e[1]) for e in self.data])
+            self.add_widget(self.table)
+            self.table.bind(on_row_press=self.print_pcsrtable2)
+        except Exception:
+            with open('baseerr.txt', 'a') as file:
+                file.write(f'{datetime.datetime.now()} Ошибка отображения таблицы компьютеров \n')
+
+
+    def print_pcsrtable2(self, instance_table, instance_row):
+        id = (instance_row.text)
+
+        if id in '0123456789':
+            connect = sqlite3.connect('InterCof.db')
+            cursor = connect.cursor()
+            self.data = cursor.execute('''
+            SELECT id FROM Model
+            WHERE id = ? 
+            LIMIT 1
+                           ''', (id,)).fetchall()
+            self.app = MDApp.get_running_app()
+            self.ids = self.app.root.ids.pcadd_screen_id.ids
+            self.ids.model_id.text = str(self.data[0][0])
+
+
+            print(*self.data, id)
+
+            connect.commit()
+            connect.close()
+
+
+class TKTable(MDGridLayout):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            # SELECT Tickets.id, Tickets.date, Users.fullname, Model.title, Tickets.time fullname FROM Users
+            connect = sqlite3.connect('InterCof.db')
+            cursor = connect.cursor()
+            self.data = cursor.execute('''
+            SELECT Tickets.id, Tickets.date, Users.fullname FROM Tickets
+            JOIN Users ON Users.id = Tickets.user_id
+                                ''').fetchall()
+            self.table = MDDataTable(size_hint=(1, 1),
+                                     pos_hint = {'center_x': 0.5,'y': 0.4},
+                                    rows_num = 1000,
+                                    column_data = [('id', 24), ('Дата', (self.width - 24) // 2),  ('ФИО', (self.width - 24) // 2)],
+                                    row_data = [(e[0], e[1], e[2]) for e in self.data])
+            self.add_widget(self.table)
+            self.table.bind(on_row_press=self.print_tktable)
+        except Exception:
+            with open('baseerr.txt', 'a') as file:
+                file.write(f'{datetime.datetime.now()} Ошибка отображения таблицы пользователей \n')
+
+
+    def print_tktable(self, instance_table, instance_row):
+        id = (instance_row.text)
+
+        if id in '0123456789':
+            connect = sqlite3.connect('InterCof.db')
+            cursor = connect.cursor()
+            self.data = cursor.execute('''
+            SELECT Tickets.id, Tickets.date, Users.fullname, Model.title, Tickets.time FROM Tickets
+            JOIN Users ON Users.id = Tickets.user_id
+            JOIN PC ON PC.id = Tickets.pc_id 
+            JOIN Model ON Model.id = PC.id_model
+            WHERE Tickets.id = ? LIMIT 1
+                           ''', (id,)).fetchall()
+            self.app = MDApp.get_running_app()
+            self.ids = self.app.root.ids.tk_screen_id.ids
+            self.ids.tk_id.text = str(self.data[0][0])
+            self.ids.tkdt_id.text = str(self.data[0][1])
+            self.ids.tkus_id.text = str(self.data[0][2])
+            self.ids.tkpc_id.text = str(self.data[0][3])
+            self.ids.tk_time.text = str(self.data[0][4])
+
+            print(self.data)
+
+            connect.commit()
+            connect.close()
+        
+
+class TKAdd(Screen):
+    def add_user_to_base(self, fullname, birthday, login, password):
+        try:
+            connect = sqlite3.connect('InterCof.db')
+            cursor = connect.cursor()
+
+            cursor.execute('''
+            INSERT INTO Users (fullname, birthday, login, password, cat_id)
+            VALUES (?, ?, ?, ?, ?)
+                        ''', (fullname, birthday, login, password, '2'))
+            self.manager.current = 'users'
+
+            connect.commit()
+            connect.close()
+        except Exception:
+            with open('baseerr.txt', 'a') as file:
+                file.write(f'{datetime.datetime.now()} Ошибка добавления пользователя \n')
+
 
 class InterRatApp(MDApp):
     def __init__(self, **kwargs):
@@ -196,11 +415,12 @@ class InterRatApp(MDApp):
     
 
     def build(self):
+        self.theme_cls.primary_palette = 'Amber'
         return MyMainLayout()
 
 
     def open_drawer(self, *arg):
-       self.root.navdrawer.set_state('open')
+       self.root.ids.nav_drawer.set_state('open')
 
 
     def enter(self, login, password, label, manager):
@@ -208,7 +428,7 @@ class InterRatApp(MDApp):
             connect = sqlite3.connect('InterCof.db')
             cursor = connect.cursor()
             lg_list = cursor.execute('''
-            SELECT login, password FROM Users
+            SELECT login, password, fullname, id FROM Users
                                     ''').fetchall()
             connect.commit()
             connect.close()
@@ -217,6 +437,10 @@ class InterRatApp(MDApp):
                 if login == e[0] and password == e[1]:
                     print(lg_list)
                     manager.current = 'menu'
+                    self.app = MDApp.get_running_app()
+                    self.ids = self.app.root.ids.menu_id.ids
+                    self.ids.usernm_info_label.text = str(e[2])
+                    self.ids.userid_info_label.text = str(e[3])
                     break
                 else:
                     print(lg_list)
