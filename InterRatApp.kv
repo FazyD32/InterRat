@@ -8,17 +8,161 @@
 
 
 <UsersScreen@Screen>
+
     BoxLayout:
         orientation: 'vertical'
+        spacing: 24
+
         MyAppBar:
 
-        UsersTable:
+        MDGridLayout:
+            cols: 2
+            spacing: 24
+            padding: [24, 32, 8, 32]
+
+            MDLabel:
+                text: 'id'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: user_id
+
+            MDLabel:
+                text: 'ФИО'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: user_namefull
+
+            MDLabel:
+                text: 'Дата рождения'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: birthday
+
+            MDLabel:
+                text: 'Логин'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: user_login
+
+            MDLabel:
+                text: 'Пароль'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: user_password
+
+            MDLabel:
+                text: 'Категория пользователя'
+                halign: 'left'
+
+            MDLabel:
+                text: ''
+                halign: 'left'
+                id: user_cat
             
+            MDGridLayout:
+                cols: 3
+                spacing: 8
+                padding: [0, 8, 8, 16]
+                size_hint_y: 0.4
+
+
+                MDRectangleFlatButton:
+                    text: 'Добавить'
+                    on_release: root.manager.current = 'usersadd'
+                    id: btn_change_user
+
+                MDRectangleFlatButton:
+                    text: 'Удалить'
+
+                MDRectangleFlatButton:
+                    text: 'Изменить'
+
+        UsersTable:
+
+<UsersScreenAdd@Screen>:
+
+    MDBoxLayout:
+        spacing: 24
+        orientation: 'vertical'
+
+        MyAppBar:
+
+        MDLabel:
+            text: 'Добавте пользователя (Отобразится после перезагрузки)'
+            halign: 'center'
+
+        MDGridLayout:
+            cols: 2
+            spacing: 24
+            size_hint: 0.8, 1
+            pos_hint: {'center_x': 0.5,'center_y': 0.0}
+
+            MDTextField:     
+                text_color_focus: 'black'
+                line_color_focus: 'black'
+                helper_text: "Введите ФИО"
+                halign: "center"
+                id: fullname_field
+
+            MDTextField:     
+                text_color_focus: 'black'
+                line_color_focus: 'black'
+                helper_text: "Введите Дату рождения в Формате YYYY-MM-DD"
+                halign: "center"
+                id: birthday_field
+
+            MDTextField:     
+                text_color_focus: 'black'
+                line_color_focus: 'black'
+                helper_text: "Введите логин"
+                icon_left: 'account'
+                halign: "center"
+                id: usrlogin_field
+
+            MDTextField:     
+                text_color_focus: 'black'
+                line_color_focus: 'black'
+                helper_text: "Введите пароль"
+                icon_left: 'magnify'
+                halign: "center"
+                id: usrpassword_field
+
+            MDGridLayout:
+                cols: 2
+                spacing: 16
+                
+
+                MDRectangleFlatButton:
+                    text: 'Добавить'
+                    on_release: root.add_user_to_base(fullname_field.text, birthday_field.text, usrlogin_field.text, usrpassword_field.text)
+                    id: btn_add_user
+                    
+
+                MDRectangleFlatButton:
+                    text: 'Отмена'
+                    on_release: root.manager.current = 'users'
+                    id: btn_add_user_cancel
+                    
+
+        MDBoxLayout:
+
 
 <PasswordScreen@Screen>
-    wronglabel: wrong_label
-    loginfield: login_field
-    passworfield: passwor_field
 
     MDBoxLayout:
         orientation: 'vertical'
@@ -61,7 +205,7 @@
             halign: 'center'
             size_hint: 0.4, 0.2
             pos_hint: {'center_x': 0.5,'y': 0.4}
-            on_release: app.enter(root.loginfield.text, root.passworfield.text, root.wronglabel, root.manager)
+            on_release: app.enter(login_field.text, passwor_field.text, wrong_label, root.manager)
 
         MDBoxLayout:
 
@@ -81,11 +225,9 @@
 
 
 <MyMainLayout>
-    navdrawer: nav_drawer
-    my_screenmg: myscmn
 
     ScreenManager:
-        id: myscmn
+        id: my_screenmg
 
         PasswordScreen:
 
@@ -94,6 +236,11 @@
 
         UsersScreen:
             name: 'users'
+            id: user_screen_id
+
+        UsersScreenAdd:
+            name: 'usersadd'
+            id: useradd_screen_id
 
     MDNavigationDrawer:
         id: nav_drawer
@@ -102,7 +249,7 @@
             orientation: 'vertical'
 
             MDLabel:
-                text: 'DesperBook'
+                text: 'InterRat'
                 font_style: 'Caption'
                 size_hint_y: None
                 height: self.texture_size[1]
@@ -112,14 +259,14 @@
                 MDList:
 
                     OneLineIconListItem:
-                        on_release: myscmn.current = 'menu'
+                        on_release: my_screenmg.current = 'menu'
                         text: 'На главную'
                         
                         IconLeftWidget:
                             icon: 'home'
 
                     OneLineIconListItem:
-                        on_release: myscmn.current = 'users'
+                        on_release: my_screenmg.current = 'users'
                         text: 'Пользователи'
 
                         IconLeftWidget:
